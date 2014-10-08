@@ -52,7 +52,7 @@ reload
 /subsystem=infinispan:add()
 reload
 /subsystem=infinispan/cache-container=web:add(module=org.jboss.as.clustering.web.infinispan,aliases=[alias=standard-session-cache],default-cache=local-web)
-/subsystem=infinispan/cache-container=web/local-cache=local-web:add()
+/subsystem=infinispan/cache-container=web/local-cache=local-web:add(batching=true)
 /subsystem=infinispan/cache-container=web/local-cache=local-web/file-store=FILE_STORE:add(passivation=false,purge=false
 /subsystem=infinispan/cache-container=hibernate:add(module=org.jboss.as.jpa.hibernate:4,default-cache=local-query)
 /subsystem=infinispan/cache-container=hibernate/local-cache=entity:add()
@@ -67,4 +67,10 @@ reload
 /subsystem=infinispan/cache-container=hibernate/local-cache=timestamps/transaction=TRANSACTION:add(mode="NONE")
 /subsystem=infinispan/cache-container=hibernate/local-cache=timestamps/eviction=EVICTION:add(strategy="NONE")
 reload
+
+Remove EJB components::
+/subsystem=ejb3/cache=clustered:remove
+/subsystem=ejb3/cluster-passivation-store=infinispan:remove
+/subsystem=ejb3/service=iiop:remove
+/subsystem=ejb3:write-attribute(name=default-clustered-sfsb-cache,value=undefined)
 
