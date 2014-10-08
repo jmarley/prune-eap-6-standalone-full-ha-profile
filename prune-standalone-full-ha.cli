@@ -13,7 +13,6 @@ reload
 /socket-binding-group=standard-sockets/socket-binding=jacorb:remove
 /socket-binding-group=standard-sockets/socket-binding=jacorb-ssl:remove
 /socket-binding-group=standard-sockets/socket-binding=jgroups-mping:remove
-/socket-binding-group=standard-sockets/socket-binding=jgroups-tcp
 /socket-binding-group=standard-sockets/socket-binding=jgroups-tcp:remove
 /socket-binding-group=standard-sockets/socket-binding=jgroups-tcp-fd:remove
 /socket-binding-group=standard-sockets/socket-binding=jgroups-udp:remove
@@ -46,7 +45,7 @@ reload
 # Configure infinispan
 /subsystem=infinispan/cache-container=web:add(module=org.jboss.as.clustering.web.infinispan,aliases=[alias=standard-session-cache],default-cache=local-web)
 /subsystem=infinispan/cache-container=web/local-cache=local-web:add(batching=true)
-/subsystem=infinispan/cache-container=web/local-cache=local-web/file-store=FILE_STORE:add(passivation=false,purge=false
+/subsystem=infinispan/cache-container=web/local-cache=local-web/file-store=FILE_STORE:add(passivation=false,purge=false)
 /subsystem=infinispan/cache-container=hibernate:add(module=org.jboss.as.jpa.hibernate:4,default-cache=local-query)
 /subsystem=infinispan/cache-container=hibernate/local-cache=entity:add()
 /subsystem=infinispan/cache-container=hibernate/local-cache=entity/transaction=TRANSACTION:add(mode=NON_XA)
@@ -61,7 +60,7 @@ reload
 /subsystem=infinispan/cache-container=hibernate/local-cache=timestamps/eviction=EVICTION:add(strategy="NONE")
 reload
 
-Remove EJB components::
+#Remove EJB components::
 /subsystem=ejb3/cache=clustered:remove
 /subsystem=ejb3/cluster-passivation-store=infinispan:remove
 /subsystem=ejb3/service=iiop:remove
