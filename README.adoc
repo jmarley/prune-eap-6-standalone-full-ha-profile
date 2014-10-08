@@ -18,6 +18,7 @@ Remove subsystems::
 /subsystem=cmp:remove
 /subsystem=jgroups:remove
 /subsystem=web/connector=ajp:remove
+reload
 
 Remove socketbindgs::
 /socket-binding-group=standard-sockets/socket-binding=jacorb:remove
@@ -32,6 +33,7 @@ Remove socketbindgs::
 /socket-binding-group=standard-sockets/socket-binding=messaging-group:remove
 /socket-binding-group=standard-sockets/socket-binding=messaging-throughput:remove
 /socket-binding-group=standard-sockets/socket-binding=modcluster:remove
+reload
 
 Remove modules extensions::
 /extension=org.jboss.as.clustering.jgroups:remove
@@ -41,10 +43,16 @@ Remove modules extensions::
 /extension=org.jboss.as.jsr77:remove
 /extension=org.jboss.as.messaging:remove
 /extension=org.jboss.as.modcluster:remove
-
+reload
 
 Add infinispan::
+
+/subsystem=infinispan:remove()
+reload
+/subsystem=infinispan:add()
+reload
 /subsystem=infinispan/cache-container=web:add(module=org.jboss.as.clustering.web.infinispan,aliases=[alias=standard-session-cache],default-cache=local-web)
+/subsystem=infinispan/cache-container=web/local-cache=local-web:add()
 /subsystem=infinispan/cache-container=web/local-cache=local-web/file-store=FILE_STORE:add(passivation=false,purge=false
 /subsystem=infinispan/cache-container=hibernate:add(module=org.jboss.as.jpa.hibernate:4,default-cache=local-query)
 /subsystem=infinispan/cache-container=hibernate/local-cache=entity:add()
@@ -58,4 +66,5 @@ Add infinispan::
 /subsystem=infinispan/cache-container=hibernate/local-cache=timestamps:add()
 /subsystem=infinispan/cache-container=hibernate/local-cache=timestamps/transaction=TRANSACTION:add(mode="NONE")
 /subsystem=infinispan/cache-container=hibernate/local-cache=timestamps/eviction=EVICTION:add(strategy="NONE")
+reload
 
