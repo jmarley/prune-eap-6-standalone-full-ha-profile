@@ -1,0 +1,61 @@
+= Downgrade standalone-full-ha.xml to standalone.xml profile
+
+Basically these are instructions on how to downgrade a standalone-full-ha.xml profile configuration to standalone-full.ha
+
+.why
+Good question. Why not just use standalone.xml, well I asked myself this same question until I was on project with a particular client that had a blackbox data center such that they provided all the jboss tooling OOB and then would trim as necessary. Their reasoning, was 
+. The subsystems were not invoked unless the app code leverages it 
+. Footprint is small
+. If all subsystems are there it is less management for each customer; everything is already there
+. Easier for admins to troubleshoot; known configuration
+
+Remove subsystems::
+/subsystem=messaging:remove
+/subsystem=modcluster:remove
+/subsystem=jsr77:remove
+/subsystem=jaxr:remove
+/subsystem=jacorb:remove
+/subsystem=cmp:remove
+/subsystem=jgroups:remove
+/subsystem=web/connector=ajp:remove
+
+Remove socketbindgs::
+/socket-binding-group=standard-sockets/socket-binding=jacorb:remove
+/socket-binding-group=standard-sockets/socket-binding=jacorb-ssl:remove
+/socket-binding-group=standard-sockets/socket-binding=jgroups-mping:remove
+/socket-binding-group=standard-sockets/socket-binding=jgroups-tcp
+/socket-binding-group=standard-sockets/socket-binding=jgroups-tcp:remove
+/socket-binding-group=standard-sockets/socket-binding=jgroups-tcp-fd:remove
+/socket-binding-group=standard-sockets/socket-binding=jgroups-udp:remove
+/socket-binding-group=standard-sockets/socket-binding=jgroups-udp-fd:remove
+/socket-binding-group=standard-sockets/socket-binding=messaging:remove
+/socket-binding-group=standard-sockets/socket-binding=messaging-group:remove
+/socket-binding-group=standard-sockets/socket-binding=messaging-throughput:remove
+/socket-binding-group=standard-sockets/socket-binding=modcluster:remove
+
+Remove modules extensions::
+/extension=org.jboss.as.clustering.jgroups:remove
+/extension=org.jboss.as.cmp:remove
+/extension=org.jboss.as.jacorb:remove
+/extension=org.jboss.as.jaxr:remove
+/extension=org.jboss.as.jsr77:remove
+/extension=org.jboss.as.messaging:remove
+/extension=org.jboss.as.modcluster:remove
+
+
+Add infinispan::
+/subsystem=infinispan/cache-container=web:add(module=org.jboss.as.clustering.web.infinispan,aliases=[alias=standard-session-cache],default-cache=local-web)
+/subsystem=infinispan/cache-container=web/local-cache=local-web/file-store=FILE_STORE:add(passivation=false,purge=false
+/subsystem=infinispan/cache-container=hibernate:add(module=org.jboss.as.jpa.hibernate:4,default-cache=local-query)
+/subsystem=infinispan/cache-container=hibernate/local-cache=entity:add()
+/subsystem=infinispan/cache-container=hibernate/local-cache=entity/transaction=TRANSACTION:add(mode=NON_XA)
+/subsystem=infinispan/cache-container=hibernate/local-cache=entity/eviction=EVICTION:add(strategy="LRU", max-entries="10000")
+/subsystem=infinispan/cache-container=hibernate/local-cache=entity/expiration=EXPIRATION:add(max-idle="100000")
+/subsystem=infinispan/cache-container=hibernate/local-cache=local-query:add()
+/subsystem=infinispan/cache-container=hibernate/local-cache=local-query/transaction=TRANSACTION:add(mode="NONE")
+/subsystem=infinispan/cache-container=hibernate/local-cache=local-query/eviction=EVICTION:add(strategy="LRU", max-entries="10000")
+/subsystem=infinispan/cache-container=hibernate/local-cache=local-query/expiration=EXPIRATION:add(max-idle="100000")
+/subsystem=infinispan/cache-container=hibernate/local-cache=timestamps:add()
+/subsystem=infinispan/cache-container=hibernate/local-cache=timestamps/transaction=TRANSACTION:add(mode="NONE")
+/subsystem=infinispan/cache-container=hibernate/local-cache=timestamps/eviction=EVICTION:add(strategy="NONE")
+
