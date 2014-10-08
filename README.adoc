@@ -2,7 +2,7 @@
 
 Basically these are instructions on how to downgrade a standalone-full-ha.xml profile configuration to standalone-full.ha
 
-.why
+why::
 Good question. Why not just use standalone.xml, well I asked myself this same question until I was on project with a particular client that had a blackbox data center such that they provided all the jboss tooling OOB and then would trim as necessary. Their reasoning, was 
 . The subsystems were not invoked unless the app code leverages it 
 . Footprint is small
@@ -10,6 +10,7 @@ Good question. Why not just use standalone.xml, well I asked myself this same qu
 . Easier for admins to troubleshoot; known configuration
 
 Remove subsystems::
+----
 /subsystem=messaging:remove
 /subsystem=modcluster:remove
 /subsystem=jsr77:remove
@@ -19,8 +20,10 @@ Remove subsystems::
 /subsystem=jgroups:remove
 /subsystem=web/connector=ajp:remove
 reload
+----
 
 Remove socketbindgs::
+----
 /socket-binding-group=standard-sockets/socket-binding=jacorb:remove
 /socket-binding-group=standard-sockets/socket-binding=jacorb-ssl:remove
 /socket-binding-group=standard-sockets/socket-binding=jgroups-mping:remove
@@ -34,8 +37,10 @@ Remove socketbindgs::
 /socket-binding-group=standard-sockets/socket-binding=messaging-throughput:remove
 /socket-binding-group=standard-sockets/socket-binding=modcluster:remove
 reload
+----
 
 Remove modules extensions::
+----
 /extension=org.jboss.as.clustering.jgroups:remove
 /extension=org.jboss.as.cmp:remove
 /extension=org.jboss.as.jacorb:remove
@@ -44,9 +49,10 @@ Remove modules extensions::
 /extension=org.jboss.as.messaging:remove
 /extension=org.jboss.as.modcluster:remove
 reload
+----
 
 Add infinispan::
-
+----
 /subsystem=infinispan:remove()
 reload
 /subsystem=infinispan:add()
@@ -67,8 +73,10 @@ reload
 /subsystem=infinispan/cache-container=hibernate/local-cache=timestamps/transaction=TRANSACTION:add(mode="NONE")
 /subsystem=infinispan/cache-container=hibernate/local-cache=timestamps/eviction=EVICTION:add(strategy="NONE")
 reload
+----
 
 Remove EJB components::
+----
 /subsystem=ejb3/cache=clustered:remove
 /subsystem=ejb3/cluster-passivation-store=infinispan:remove
 /subsystem=ejb3/service=iiop:remove
@@ -76,3 +84,4 @@ Remove EJB components::
 /subsystem=ejb3:write-attribute(name=default-mdb-instance-pool,value=undefined)
 /subsystem=ejb3:write-attribute(name=default-resource-adapter-name,value=undefined)
 reload
+----
