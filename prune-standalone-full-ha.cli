@@ -1,15 +1,4 @@
-= Downgrade standalone-full-ha.xml to standalone.xml profile
-
-Basically these are instructions on how to downgrade a standalone-full-ha.xml profile configuration to standalone-full.ha
-
-.why
-Good question. Why not just use standalone.xml, well I asked myself this same question until I was on project with a particular client that had a blackbox data center such that they provided all the jboss tooling OOB and then would trim as necessary. Their reasoning, was 
-. The subsystems were not invoked unless the app code leverages it 
-. Footprint is small
-. If all subsystems are there it is less management for each customer; everything is already there
-. Easier for admins to troubleshoot; known configuration
-
-Remove subsystems::
+# Remove subsystems
 /subsystem=messaging:remove
 /subsystem=modcluster:remove
 /subsystem=jsr77:remove
@@ -20,7 +9,7 @@ Remove subsystems::
 /subsystem=web/connector=ajp:remove
 reload
 
-Remove socketbindgs::
+# Remove socketbindgs
 /socket-binding-group=standard-sockets/socket-binding=jacorb:remove
 /socket-binding-group=standard-sockets/socket-binding=jacorb-ssl:remove
 /socket-binding-group=standard-sockets/socket-binding=jgroups-mping:remove
@@ -35,7 +24,7 @@ Remove socketbindgs::
 /socket-binding-group=standard-sockets/socket-binding=modcluster:remove
 reload
 
-Remove modules extensions::
+# Remove modules extensions
 /extension=org.jboss.as.clustering.jgroups:remove
 /extension=org.jboss.as.cmp:remove
 /extension=org.jboss.as.jacorb:remove
@@ -45,12 +34,16 @@ Remove modules extensions::
 /extension=org.jboss.as.modcluster:remove
 reload
 
-Add infinispan::
+# Remove/add infinispan subsystem
 
 /subsystem=infinispan:remove()
 reload
+
+# Add infinispan
 /subsystem=infinispan:add()
 reload
+
+# Configure infinispan
 /subsystem=infinispan/cache-container=web:add(module=org.jboss.as.clustering.web.infinispan,aliases=[alias=standard-session-cache],default-cache=local-web)
 /subsystem=infinispan/cache-container=web/local-cache=local-web:add(batching=true)
 /subsystem=infinispan/cache-container=web/local-cache=local-web/file-store=FILE_STORE:add(passivation=false,purge=false
